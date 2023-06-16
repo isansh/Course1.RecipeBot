@@ -6,7 +6,7 @@ using System.Reflection.PortableExecutable;
 
 namespace Course1.RecipeBot.Api.Controllers
 {
-    [Route("[controller]")]
+    [Route("api/[controller]/[action]")]
     [Controller]
     public class FavoriteRecipeController : Controller
     {

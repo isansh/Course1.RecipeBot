@@ -5,7 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Course1.RecipeBot.Api.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("api/[controller]/[action]")]
     [ApiController]
     public class RecipeYoutubeLinkController : ControllerBase
     {
