@@ -17,7 +17,7 @@ namespace Course1.RecipeBot.Api.Controllers
         public RecipeBeChatGptModel GetRecipeMealKind(MealKind mealKind)
         {
             RecipeByChatGPTClient gptclient = new RecipeByChatGPTClient();
-            var resultTask = gptclient.GetAsyncRecipe($"Рецепт на {mealKind}, укр, назва, інгридієнти, спосіб");
+            var resultTask = gptclient.GetAsyncRecipe($"Рецепт на {mealKind}, укр, назва, інгредієнти, спосіб");
             var result = resultTask.Result;
             if (result.choices.Length > 0)
                 return new RecipeBeChatGptModel

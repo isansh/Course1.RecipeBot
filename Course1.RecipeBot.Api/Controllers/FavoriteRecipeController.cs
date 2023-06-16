@@ -12,19 +12,19 @@ namespace Course1.RecipeBot.Api.Controllers
     {
         string connectionString = "Server=art1023-test-db-server.database.windows.net;Database=RecipeDB;User Id=rodaragoi;Password=Zaqwes123@;";
         [HttpPost]
-        public IActionResult AddToFavorites(string recipe, long chatId, DateTime dateCallBackQuery)
+        public IActionResult AddToFavorites(string recipe, long chatId, DateTime DateAdded)
         {
             using (SqlConnection connection = new SqlConnection(connectionString))
             {
                 connection.Open();
 
-                string query = "INSERT INTO FavoriteRecipes (Recipe, Id, DateCallBackQuery) VALUES (@Recipe, @Id, @DateCallBackQuery)";
+                string query = "INSERT INTO FavoriteRecipes (Recipe, ChatId, DateAdded) VALUES (@Recipe, @ChatId, @DateAdded)";
 
                 using (SqlCommand command = new SqlCommand(query, connection))
                 {
                     command.Parameters.AddWithValue("@Recipe", recipe);
-                    command.Parameters.AddWithValue("@Id", chatId);
-                    command.Parameters.AddWithValue("@DateCallBackQuery", dateCallBackQuery);
+                    command.Parameters.AddWithValue("@ChatId", chatId);
+                    command.Parameters.AddWithValue("@DateAdded", DateAdded);
 
                     int rowsAffected = command.ExecuteNonQuery();
                 }
@@ -40,12 +40,12 @@ namespace Course1.RecipeBot.Api.Controllers
             {
                 connection.Open();
 
-                string query = "DELETE FROM FavoriteRecipes WHERE Recipe = @Recipe AND Id = @Id";
+                string query = "DELETE FROM FavoriteRecipes WHERE Recipe = @Recipe AND ChatId = @ChatId";
 
                 using (SqlCommand command = new SqlCommand(query, connection))
                 {
                     command.Parameters.AddWithValue("@Recipe", recipe);
-                    command.Parameters.AddWithValue("@Id", chatId);
+                    command.Parameters.AddWithValue("@ChatId", chatId);
 
 
                     int rowsAffected = command.ExecuteNonQuery();
@@ -62,11 +62,11 @@ namespace Course1.RecipeBot.Api.Controllers
             {
                 connection.Open();
 
-                string sqlQuery = $"SELECT Recipe FROM FavoriteRecipes WHERE Id = @chatid ORDER BY DateCallBackQuery OFFSET {numberOfRecipe} ROWS FETCH NEXT 1 ROWS ONLY";
+                string sqlQuery = $"SELECT Recipe FROM FavoriteRecipes WHERE ChatId = @ChatId ORDER BY DateAdded OFFSET {numberOfRecipe} ROWS FETCH NEXT 1 ROWS ONLY";
                 using (SqlCommand command = new SqlCommand(sqlQuery, connection))
                 {
                     object recipedb;
-                    command.Parameters.AddWithValue("@chatid", chatId);
+                    command.Parameters.AddWithValue("@ChatId", chatId);
                     object result = command.ExecuteScalar();
                     
                         if (result != null)
@@ -94,11 +94,11 @@ namespace Course1.RecipeBot.Api.Controllers
             {
                 connection.Open();
 
-                string sqlQuery = "SELECT COUNT(*) FROM FavoriteRecipes WHERE Id = @chatId";
+                string sqlQuery = "SELECT COUNT(*) FROM FavoriteRecipes WHERE ChatId = @ChatId";
 
                 using (SqlCommand command = new SqlCommand(sqlQuery, connection))
                 {
-                    command.Parameters.AddWithValue("@chatId", chatId);
+                    command.Parameters.AddWithValue("@ChatId", chatId);
 
                     int count = Convert.ToInt32(command.ExecuteScalar());
                     return new FavoriteRecipeModel

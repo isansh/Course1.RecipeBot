@@ -12,10 +12,10 @@ namespace Course1.RecipeBot.Api.Client
         public RecipeByChatGPTClient()
         {
             _adress = "https://api.openai.com/";
-            _apikey = "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";
+            _apikey = "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";
             _httpClient = new HttpClient();
             _httpClient.BaseAddress = new Uri(_adress);
-            _httpClient.DefaultRequestHeaders.Add("Authorization", "Bearer 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");
+            _httpClient.DefaultRequestHeaders.Add("Authorization", "Bearer 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");
         }
         public async Task<GptChatCompletionResponse> GetAsyncRecipe(string recipe)
         {

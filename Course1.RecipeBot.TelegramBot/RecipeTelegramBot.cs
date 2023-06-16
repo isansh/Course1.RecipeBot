@@ -225,7 +225,7 @@ namespace Course1.RecipeBot.TelegramBot
                 RecipeService recipeService = new RecipeService();
                 int count = recipeService.CountFavoriteRecipe(chatId);
                 helperYoutube = 0;
-                if (count == 0)
+                if ( count == 0)
                 {
                     ReplyKeyboardMarkup replyKeyboardMarkup = new
                        (
