@@ -39,6 +39,7 @@ namespace Course1.RecipeBot.TelegramBot
             var content = response.Content.ReadAsStringAsync().Result;
             var result = JsonConvert.DeserializeObject<RecipeApiModel>(content);
             return result;
+
         }
     }
 }
