@@ -5,9 +5,6 @@ using System.Runtime.ConstrainedExecution;
 using System.Text;
 using System.Threading.Tasks;
 using System.Web;
-using Course1.RecipeBot.Api;
-using Course1.RecipeBot.Api.Client;
-using Course1.RecipeBot.Api.Controllers;
 using Course1.RecipeBot.Shared;
 
 
@@ -22,9 +19,7 @@ namespace Course1.RecipeBot.TelegramBot
             RecipeApiClient recipeApiClient = new RecipeApiClient();
             var resultTask = recipeApiClient.GetAsyncRecipe(recipeMealKind);
             var result = resultTask.Result;
-            //if (result.choices.Length > 0)
-                return result.recipe;
-            //else return "За вашим запитом нічого не знайдено";
+                return result.Recipe;
         }
 
         public string GetRecipeByIngredients(string ingridients)
@@ -33,48 +28,51 @@ namespace Course1.RecipeBot.TelegramBot
             RecipeApiClient recipeApiClient = new RecipeApiClient();
             var resultTask = recipeApiClient.GetAsyncRecipe(ingridients);
             var result = resultTask.Result;
-            //if (result.choices.Length > 0)
-                return result.recipe;
-            //else return "За вашим запитом нічого не знайдено";
+                return result.Recipe;
         }
 
         public string GetReceipeVideoLink(string recipeName)
         {
             recipeName = HttpUtility.UrlEncode(recipeName);
             recipeName = recipeName.ToUpper();
-            recipeName = $"YoutubeLink?recipeName={recipeName}";
+            recipeName = $"YoutubeLink/GetYoutubeLink?recipeName={recipeName}";
             RecipeApiClient recipeClient = new RecipeApiClient();
             var resultL = recipeClient.GetAsyncRecipe(recipeName);
             var resultLink = resultL.Result;
-            //if (resultLink.items.Length > 0)
-                return resultLink.url;
-            //else return "За вашим запитом нічого не знайдено";
+                return resultLink.Url;
         }
 
         public string AddToFavorites(string recipe, long chatId, DateTime dateCallBackQuery)
         {
-            FavoriteRecipeController favoriteRecipeController = new FavoriteRecipeController();
-            favoriteRecipeController.AddToFavorites(recipe, chatId, dateCallBackQuery);
+            string dateAdded = dateCallBackQuery.ToString("yyyy-MM-ddTHH:mm:ss");
+            RecipeApiClient recipeApiClient = new RecipeApiClient();
+            var resultTask = recipeApiClient.AddToFavoritesAsync(recipe, chatId, dateAdded);
+            var result = resultTask.Result;
             return "Додано";
         }
 
         public string DeleteFromFavorites(string recipe, long chatId)
         {
-            FavoriteRecipeController favoriteRecipeController = new FavoriteRecipeController();
-            favoriteRecipeController.DeleteFromFavorites(recipe, chatId);
+            recipe = $"Favorites/DeleteFromFavorites?recipe={recipe}&chatId={chatId}";
+            RecipeApiClient recipeApiClient = new RecipeApiClient();
+            var resultTask = recipeApiClient.DeleteAsyncRecipe(recipe);
+            var result = resultTask.Result;
             return "Видалено";
         }
+
         public string GetFavoriteRecipes(int numberRecipe, long chatId)
         {
-            FavoriteRecipeController favoriteRecipeController = new FavoriteRecipeController();
-            var recipe = favoriteRecipeController.GetFavoriteRecipes(numberRecipe, chatId);
-            return recipe.Recipe;
+            string recipe = $"Favorites/GetFavoriteRecipes?numberOfRecipe={numberRecipe}&chatId={chatId}";
+            RecipeApiClient recipeApiClient = new RecipeApiClient();
+            var resultTask = recipeApiClient.GetAsyncRecipe(recipe);
+            return resultTask.Result.Recipe;
         }
         public int CountFavoriteRecipe(long chatId)
         {
-            FavoriteRecipeController favoriteRecipeController = new FavoriteRecipeController();
-            int result = favoriteRecipeController.GetCountFavoriteRecipes(chatId).Count;
-            return result;
+            string recipe = $"Favorites/GetCountFavoriteRecipes?chatId={chatId}";
+            RecipeApiClient recipeApiClient = new RecipeApiClient();
+            var resultTask = recipeApiClient.GetAsyncRecipe(recipe);
+            return resultTask.Result.Count;
         }
     }
 }

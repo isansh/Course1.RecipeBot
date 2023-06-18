@@ -1,34 +1,35 @@
-﻿using Course1.RecipeBot.Api;
-using Course1.RecipeBot.Api.Models;
+﻿using Course1.RecipeBot.Api.Models;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System.Data.SqlClient;
-using System.Reflection.PortableExecutable;
 
 namespace Course1.RecipeBot.Api.Controllers
 {
     [Route("api/[controller]/[action]")]
-    [Controller]
-    public class FavoriteRecipeController : Controller
+    [ApiController]
+    public class RecipeFavoritesController : ControllerBase
     {
-        string connectionString = "Server=art1023-test-db-server.database.windows.net;Database=RecipeDB;User Id=rodaragoi;Password=Zaqwes123@;";
+        public string connectionString = "Server=tcp:cource1-receipe-bot-db.database.windows.net;Initial Catalog=ReceipeDB;User ID=inna2005sha;Password=Zaqwes123@;"; //,1433   .net, Persist Security Info=False; User
         [HttpPost]
-        public IActionResult AddToFavorites(string recipe, long chatId, DateTime DateAdded)
+        public IActionResult AddToFavorites(string recipe, long chatId, string DateAdded) //
         {
+            connectionString = "Server=tcp:cource1-receipe-bot-db.database.windows.net,1433;Initial Catalog=ReceipeDB;Persist Security Info=False;User ID=inna2005sha;Password=Zaqwes123@;";
             using (SqlConnection connection = new SqlConnection(connectionString))
             {
+
                 connection.Open();
 
                 string query = "INSERT INTO FavoriteRecipes (Recipe, ChatId, DateAdded) VALUES (@Recipe, @ChatId, @DateAdded)";
+               // string query = "INSERT INTO FavoriteRecipes (Recipe, ChatId) VALUES (@Recipe, @ChatId)";
 
                 using (SqlCommand command = new SqlCommand(query, connection))
                 {
                     command.Parameters.AddWithValue("@Recipe", recipe);
                     command.Parameters.AddWithValue("@ChatId", chatId);
                     command.Parameters.AddWithValue("@DateAdded", DateAdded);
-
                     int rowsAffected = command.ExecuteNonQuery();
                 }
-                connection.Close();
+
             }
             return Ok();
         }
@@ -46,8 +47,6 @@ namespace Course1.RecipeBot.Api.Controllers
                 {
                     command.Parameters.AddWithValue("@Recipe", recipe);
                     command.Parameters.AddWithValue("@ChatId", chatId);
-
-
                     int rowsAffected = command.ExecuteNonQuery();
                 }
                 connection.Close();
@@ -68,8 +67,8 @@ namespace Course1.RecipeBot.Api.Controllers
                     object recipedb;
                     command.Parameters.AddWithValue("@ChatId", chatId);
                     object result = command.ExecuteScalar();
-                    
-                        if (result != null)
+
+                    if (result != null)
                     {
                         string recipe = result.ToString();
                         return new FavoriteRecipeModel
@@ -83,7 +82,7 @@ namespace Course1.RecipeBot.Api.Controllers
                     };
                     connection.Close();
                 }
-                
+
             }
         }
 
@@ -101,11 +100,12 @@ namespace Course1.RecipeBot.Api.Controllers
                     command.Parameters.AddWithValue("@ChatId", chatId);
 
                     int count = Convert.ToInt32(command.ExecuteScalar());
+                    connection.Close();
                     return new FavoriteRecipeModel
                     {
                         Count = count
                     };
-                    connection.Close();
+
                 }
             }
         }

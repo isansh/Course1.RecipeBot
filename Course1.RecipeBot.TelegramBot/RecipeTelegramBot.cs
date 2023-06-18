@@ -16,7 +16,6 @@ using Telegram.Bot.Exceptions;
 using System.Threading;
 using static System.Net.Mime.MediaTypeNames;
 using Course1.RecipeBot.Shared;
-using Course1.RecipeBot.Api;
 
 namespace Course1.RecipeBot.TelegramBot
 {
@@ -252,7 +251,7 @@ namespace Course1.RecipeBot.TelegramBot
                 
                 else
                 {
-                    
+
                     recipe = recipeService.GetFavoriteRecipes(numberrecipe, chatId);
                     More = "Наступний";
                     GetKeyboardFavorite(More, message, recipe);

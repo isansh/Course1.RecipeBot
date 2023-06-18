@@ -18,16 +18,24 @@ namespace Course1.RecipeBot.Api.Controllers
         {
             RecipeByChatGPTClient gptclient = new RecipeByChatGPTClient();
             var resultTask = gptclient.GetAsyncRecipe($"Рецепт на {mealKind}, укр, назва, інгредієнти, спосіб");
-            var result = resultTask.Result;
-            if (result.choices.Length > 0)
-                return new RecipeBeChatGptModel
-                {
-                    Recipe = result.choices[0].message.content
-                };
-            else return new RecipeBeChatGptModel
+            //if (resultTask.Id != 200)
+            //    return new RecipeBeChatGptModel
+            //    {
+            //        Recipe = "Нічого не знайдено"
+            //    };
+            //else
             {
-                Recipe = "За вашим запитом нічого не знайдено"
-            };
+                var result = resultTask.Result;
+                if (result.choices.Length > 0)
+                    return new RecipeBeChatGptModel
+                    {
+                        Recipe = result.choices[0].message.content
+                    };
+                else return new RecipeBeChatGptModel
+                {
+                    Recipe = "Нічого не знайдено"
+                };
+            }
         }
 
         [HttpGet]
@@ -35,16 +43,24 @@ namespace Course1.RecipeBot.Api.Controllers
         {
             RecipeByChatGPTClient gptclient = new RecipeByChatGPTClient();
             var resultTask = gptclient.GetAsyncRecipe($"Рецепт з {ingridients}, укр, назва, інгридієнти, спосіб");
-            var result = resultTask.Result;
-            if (result.choices.Length > 0)
-                return new RecipeBeChatGptModel
+            //if (resultTask.Id != 200)
+            //    return new RecipeBeChatGptModel
+            //    {
+            //        Recipe = "Нічого не знайдено"
+            //    };
+            //else
             {
-                Recipe = result.choices[0].message.content
-            };
-            else return new RecipeBeChatGptModel
-            {
-                Recipe = "За вашим запитом нічого не знайдено"
-        }; 
+                var result = resultTask.Result;
+                if (result.choices.Length > 0)
+                    return new RecipeBeChatGptModel
+                    {
+                        Recipe = result.choices[0].message.content
+                    };
+                else return new RecipeBeChatGptModel
+                {
+                    Recipe = "Нічого не знайдено"
+                };
+            }
         }
     }
     

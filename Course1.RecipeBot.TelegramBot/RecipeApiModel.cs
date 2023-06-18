@@ -8,7 +8,10 @@ namespace Course1.RecipeBot.TelegramBot
 {
     public class RecipeApiModel
     {
-        public string recipe { get; set; }
-        public string url { get; set; }
+        public string Recipe { get; set; }
+        public string ChatId { get; set; }
+        public string DateAdded { get; set; }
+        public string Url { get; set; }
+        public int Count { get; set; }
     }
 }

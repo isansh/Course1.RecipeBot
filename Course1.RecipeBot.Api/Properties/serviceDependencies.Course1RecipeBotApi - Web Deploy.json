@@ -3,6 +3,13 @@
     "apis1": {
       "resourceId": "/subscriptions/[parameters('subscriptionId')]/resourceGroups/[parameters('resourceGroupName')]/providers/Microsoft.ApiManagement/service/Course1RecipeBotApiapi/apis/Course1RecipeBotApi",
       "type": "apis.azure"
+    },
+    "mssql1": {
+      "serviceConnectorResourceId": "/subscriptions/[parameters('subscriptionId')]/resourceGroups/[parameters('resourceGroupName')]/providers/Microsoft.Web/sites/Course1RecipeBotApi/providers/Microsoft.ServiceLinker/linkers/ConnectionDB_D6688D32D6",
+      "secretStore": "AzureAppSettings",
+      "resourceId": "/subscriptions/[parameters('subscriptionId')]/resourceGroups/[parameters('resourceGroupName')]/providers/Microsoft.Sql/servers/cource1-receipe-bot-db/databases/ReceipeDB",
+      "type": "mssql.azure",
+      "connectionId": "ConnectionDB"
     }
   }
 }
