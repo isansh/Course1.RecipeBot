@@ -11,7 +11,7 @@ namespace Course1.RecipeBot.TelegramBot
 
         public RecipeApiClient()
         {
-            _adress = "https://course1recipebotapi.azurewebsites.net"; //    https://localhost:7215
+            _adress = "https://localhost:7215"; // https://course1recipebotapi.azurewebsites.net
             _httpClient = new HttpClient();
             _httpClient.BaseAddress = new Uri(_adress);
         }
