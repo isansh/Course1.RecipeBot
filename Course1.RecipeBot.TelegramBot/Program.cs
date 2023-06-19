@@ -3,11 +3,12 @@ namespace Course1.RecipeBot.TelegramBot
 {
     internal class Program
     {
+        static RecipeTelegramBot recipeBot;
+
         static void Main(string[] args)
         {
-
-            RecipeTelegramBot recipe22Bot = new RecipeTelegramBot();
-            recipe22Bot.Start();
+            recipeBot = new RecipeTelegramBot();
+            recipeBot.Start();
             Console.ReadKey();
         }
     }

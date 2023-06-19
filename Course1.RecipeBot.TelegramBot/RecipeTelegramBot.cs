@@ -1,21 +1,11 @@
-﻿using Microsoft.VisualBasic;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using Course1.RecipeBot.Shared;
 using Telegram.Bot;
-using Telegram.Bot.Args;
-using Telegram.Bot.Extensions;
+using Telegram.Bot.Exceptions;
+//using Telegram.Bot.Extensions.Polling;
+using Telegram.Bot.Polling;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
 using Telegram.Bot.Types.ReplyMarkups;
-//using Telegram.Bot.Extensions.Polling;
-using Telegram.Bot.Polling;
-using Telegram.Bot.Exceptions;
-using System.Threading;
-using static System.Net.Mime.MediaTypeNames;
-using Course1.RecipeBot.Shared;
 
 namespace Course1.RecipeBot.TelegramBot
 {
@@ -34,6 +24,8 @@ namespace Course1.RecipeBot.TelegramBot
         TelegramBotClient botClient = new TelegramBotClient("5951590671:AAEvvOAzMjXlGT22WlqO1-tibb2NIREY0Ek");
         CancellationToken token = new CancellationToken();
         ReceiverOptions receiverOptions = new ReceiverOptions { AllowedUpdates = { } };
+
+        RecipeService recipeService = new RecipeService();
 
         public async Task Start()
         {
@@ -57,58 +49,62 @@ namespace Course1.RecipeBot.TelegramBot
 
         private async Task HandletUpdateAsync(ITelegramBotClient botclient, Update update, CancellationToken cancellationtoken)
         {
-
-            
-
-            if (update.Type == UpdateType.CallbackQuery)
+            try
             {
-                  dateCallBackQuery = update.CallbackQuery.Message.Date;
-                chatId = update.CallbackQuery.Message.Chat.Id;
-                if (update.CallbackQuery.Data == "add")
+                if (update.Type == UpdateType.CallbackQuery)
                 {
-                    RecipeService recipeService = new RecipeService();
-                        action = recipeService.AddToFavorites(update.CallbackQuery.Message.Text, chatId, dateCallBackQuery);
-                    var markup = new InlineKeyboardMarkup(
-                    new[]
-                        {
+                    dateCallBackQuery = update.CallbackQuery.Message.Date;
+                    chatId = update.CallbackQuery.Message.Chat.Id;
+                    if (update.CallbackQuery.Data == "add")
+                    {
+                        action = this.recipeService.AddToFavorites(update.CallbackQuery.Message.Text, chatId, dateCallBackQuery);
+                        var markup = new InlineKeyboardMarkup(
+                        new[]
+                            {
                         new []
                         {
                             InlineKeyboardButton.WithCallbackData("Видалити з обраного", "remove")
                         }
-                        }
-                );
+                            }
+                    );
 
 
-                    await botClient.EditMessageTextAsync(update.CallbackQuery.Message.Chat.Id,
-                          update.CallbackQuery.Message.MessageId, update.CallbackQuery.Message.Text, replyMarkup: markup);
-                    return;
-                }
-                else if (update.CallbackQuery.Data == "remove")
-                {
-                    RecipeService recipeService = new RecipeService();
-                    action = recipeService.DeleteFromFavorites(update.CallbackQuery.Message.Text, chatId);
-                    var markup = new InlineKeyboardMarkup(new[]
+                        await botClient.EditMessageTextAsync(update.CallbackQuery.Message.Chat.Id,
+                              update.CallbackQuery.Message.MessageId, update.CallbackQuery.Message.Text, replyMarkup: markup);
+                        numberrecipe++;
+                        return;
+                    }
+                    else if (update.CallbackQuery.Data == "remove")
                     {
+                        action = recipeService.DeleteFromFavorites(update.CallbackQuery.Message.Text, chatId);
+                        var markup = new InlineKeyboardMarkup(new[]
+                        {
                         InlineKeyboardButton.WithCallbackData("♥ Додати в обране", "add"),
 
                     });
-                    await botClient.EditMessageTextAsync(update.CallbackQuery.Message.Chat.Id,
-                         update.CallbackQuery.Message.MessageId, update.CallbackQuery.Message.Text, replyMarkup: markup);
-                    return;
-                }
+                        await botClient.EditMessageTextAsync(update.CallbackQuery.Message.Chat.Id,
+                             update.CallbackQuery.Message.MessageId, update.CallbackQuery.Message.Text, replyMarkup: markup);
+                        numberrecipe--;
+                        return;
+                    }
 
-            }
-            else
-                if (update.Message == null)
-                return;
-            else
-                // Only process text messages
-                chatId = update.Message.Chat.Id;
+                }
+                else
+                    if (update.Message == null)
+                    return;
+                else
+                    // Only process text messages
+                    chatId = update.Message.Chat.Id;
                 if (update.Type == UpdateType.Message && update?.Message?.Text != null)
-            {
-                await HandleMessageAsync(botClient, update.Message);
+                {
+                    await HandleMessageAsync(botClient, update.Message);
+                }
             }
-           
+            catch (Exception ex)
+            {
+                await botClient.SendTextMessageAsync(update.Message.Chat.Id, "Сталась помилка. Будь ласка, зверніться до адміністратора");
+            }
+
         }
         private async Task HandleMessageAsync(ITelegramBotClient botClient, Message message)
         {
@@ -132,11 +128,16 @@ namespace Course1.RecipeBot.TelegramBot
             {
                 message.Text = "Вечеря";
             }
+            if (message.Text == "/favorite")
+            {
+                numberrecipe = 0;
+            }
             if (message.Text == "Наступний")
             {
+                numberrecipe++;
                 message.Text = "/favorite";
             }
-            
+
             if (message.Text == "/start")
             {
                 ReplyKeyboardMarkup replyKeyboardMarkup = new
@@ -159,7 +160,6 @@ namespace Course1.RecipeBot.TelegramBot
             {
                 await botClient.SendTextMessageAsync(message.Chat.Id, "Будь ласка, зачекайте 20 секунд. Бот шукає рецепт");
 
-                RecipeService recipeService = new RecipeService();
                 recipe = recipeService.GetRecipe(MealKind.Breakfast);
                 More = "Ще один рецепт";
                 GetKeyboards(More, message, recipe);
@@ -169,7 +169,6 @@ namespace Course1.RecipeBot.TelegramBot
             if (message.Text == "Обід")
             {
                 await botClient.SendTextMessageAsync(message.Chat.Id, "Будь ласка, зачекайте 20 секунд. Бот шукає рецепт");
-                RecipeService recipeService = new RecipeService();
                 recipe = recipeService.GetRecipe(MealKind.Lunch);
                 More = "Ще варіант";
                 GetKeyboards(More, message, recipe);
@@ -179,7 +178,6 @@ namespace Course1.RecipeBot.TelegramBot
             if (message.Text == "Вечеря")
             {
                 await botClient.SendTextMessageAsync(message.Chat.Id, "Будь ласка, зачекайте 20 секунд. Бот шукає рецепт");
-                RecipeService recipeService = new RecipeService();
                 recipe = recipeService.GetRecipe(MealKind.Dinner);
                 More = "Наступний рецепт";
                 GetKeyboards(More, message, recipe);
@@ -191,7 +189,6 @@ namespace Course1.RecipeBot.TelegramBot
             {
                 await botClient.SendTextMessageAsync(message.Chat.Id, "Будь ласка, зачекайте 20 секунд. Бот шукає рецепт");
                 helperYoutube = 0;
-                RecipeService recipeService = new RecipeService();
                 recipe = recipeService.GetRecipeByIngredients(previousmessagewithingridients);
                 More = "Ще один";
                 GetKeyboards(More, message, recipe);
@@ -200,9 +197,8 @@ namespace Course1.RecipeBot.TelegramBot
             }
             if (message.Text == "Ще")
             {
-                
+
                 helperYoutube++;
-                RecipeService recipeService = new RecipeService();
                 recipe = recipeService.GetReceipeVideoLink(youtuberecipe + helperYoutube);
                 ReplyKeyboardMarkup replyKeyboardMarkup = new
                         (
@@ -218,13 +214,12 @@ namespace Course1.RecipeBot.TelegramBot
 
                 return;
             }
-            
+
             if (message.Text == "/favorite")
             {
-                RecipeService recipeService = new RecipeService();
                 int count = recipeService.CountFavoriteRecipe(chatId);
                 helperYoutube = 0;
-                if ( count == 0)
+                if (count == 0)
                 {
                     ReplyKeyboardMarkup replyKeyboardMarkup = new
                        (
@@ -240,7 +235,7 @@ namespace Course1.RecipeBot.TelegramBot
                     return;
                 }
                 else
-                if (count == numberrecipe+1 && message.Text != "/youtube")
+                if (count == numberrecipe + 1 && message.Text != "/youtube")
                 {
                     recipe = recipeService.GetFavoriteRecipes(numberrecipe, chatId);
                     More = "";
@@ -248,23 +243,40 @@ namespace Course1.RecipeBot.TelegramBot
                     numberrecipe = 0;
                     return;
                 }
-                
+
                 else
                 {
 
                     recipe = recipeService.GetFavoriteRecipes(numberrecipe, chatId);
-                    More = "Наступний";
-                    GetKeyboardFavorite(More, message, recipe);
-                    numberrecipe++;
-                    return;
+                    if (recipe == "Рецепт не знайдено")
+                    {
+                        ReplyKeyboardMarkup replyKeyboardMarkup = new
+                       (
+                         new[]
+                         {
+                          new KeyboardButton[] {"", "Назад"},
+                         }
+                       )
+                        {
+                            ResizeKeyboard = true
+                        };
+                        await botClient.SendTextMessageAsync(message.Chat.Id, recipe, replyMarkup: replyKeyboardMarkup);
+                        return;
+                    }
+                    else
+                    {
+                        More = "Наступний";
+                        GetKeyboardFavorite(More, message, recipe);
+                        return;
+                    }
                 }
             }
 
-            
 
-                if (message.Text == "З моїх інгредієнтів")
+
+            if (message.Text == "З моїх інгредієнтів")
             {
-                
+
                 ReplyKeyboardMarkup replyKeyboardMarkup = new
                         (
                           new[]
@@ -279,8 +291,8 @@ namespace Course1.RecipeBot.TelegramBot
                 previousmessage = "Введіть ваші інгредієнти через кому";
                 return;
             }
-            else 
-            if (message.Text == "/youtube")
+            else
+        if (message.Text == "/youtube")
             {
                 helperYoutube++;
                 numberrecipe = 0;
@@ -297,10 +309,9 @@ namespace Course1.RecipeBot.TelegramBot
                 await botClient.SendTextMessageAsync(message.Chat.Id, "Введіть назву страви", replyMarkup: replyKeyboardMarkup);
                 previousmessage = "Введіть назву страви";
                 return;
-            } 
-                else if (previousmessage == "Введіть назву страви")
+            }
+            else if (previousmessage == "Введіть назву страви")
             {
-                RecipeService recipeService = new RecipeService();
                 recipe = recipeService.GetReceipeVideoLink(message.Text + helperYoutube);
                 ReplyKeyboardMarkup replyKeyboardMarkup = new
                         (
@@ -315,11 +326,11 @@ namespace Course1.RecipeBot.TelegramBot
                 await botClient.SendTextMessageAsync(message.Chat.Id, recipe, replyMarkup: replyKeyboardMarkup);
                 previousmessage = "";
                 youtuberecipe = message.Text;
-            } else
-            if (previousmessage == "Введіть ваші інгредієнти через кому")
+            }
+            else
+        if (previousmessage == "Введіть ваші інгредієнти через кому")
             {
                 await botClient.SendTextMessageAsync(message.Chat.Id, "Будь ласка, зачекайте 20 секунд. Бот шукає рецепт");
-                RecipeService recipeService = new RecipeService();
                 recipe = recipeService.GetRecipeByIngredients(message.Text);
                 More = "Ще один";
                 GetKeyboards(More, message, recipe);
@@ -328,7 +339,7 @@ namespace Course1.RecipeBot.TelegramBot
             }
             else
             {
-               
+
                 ReplyKeyboardMarkup replyKeyboardMarkup = new
                         (
                           new[]
@@ -371,11 +382,11 @@ namespace Course1.RecipeBot.TelegramBot
 
 
         }
-        
+
         public async void GetKeyboardFavorite(string More, Message message, string recipe)
         {
             string text = "Видалити з обраного";
-            
+
             InlineKeyboardMarkup inlineKeyboard = new InlineKeyboardMarkup(new[]
             {
                 new[]
@@ -392,9 +403,9 @@ namespace Course1.RecipeBot.TelegramBot
 
                   }
                 )
-        {
-            ResizeKeyboard = true
-        };
+            {
+                ResizeKeyboard = true
+            };
             await botClient.SendTextMessageAsync(message.Chat.Id, "Збережений рецепт:", replyMarkup: replyKeyboardMarkup);
             await botClient.SendTextMessageAsync(message.Chat.Id, recipe, replyMarkup: inlineKeyboard);
         }

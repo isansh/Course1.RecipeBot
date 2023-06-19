@@ -11,9 +11,4 @@
   <ItemGroup>
     <ProjectReference Include="..\Course1.RecipeBot.Shared\Course1.RecipeBot.Shared.csproj" />
   </ItemGroup>
-  <ItemGroup>
-    <None Update="Settings.job">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-  </ItemGroup>
 </Project>

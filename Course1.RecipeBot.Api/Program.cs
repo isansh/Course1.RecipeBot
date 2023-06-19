@@ -27,7 +27,7 @@ namespace Course1.RecipeBot.Api
             app.UseAuthorization();
 
 
-            app.MapControllers();
+           app.MapControllers();
 
             app.Run();
         }

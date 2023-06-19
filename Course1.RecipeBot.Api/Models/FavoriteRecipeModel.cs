@@ -3,7 +3,7 @@
     public class FavoriteRecipeModel
     {
         public string Recipe { get; set; }
-        public string ChatId { get; set; }
+        public int ChatId { get; set; }
         public int Count { get; set; }
     }
 }

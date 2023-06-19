@@ -11,7 +11,7 @@ namespace Course1.RecipeBot.Api.Controllers
     {
         public string connectionString = "Server=tcp:cource1-receipe-bot-db.database.windows.net;Initial Catalog=ReceipeDB;User ID=inna2005sha;Password=Zaqwes123@;"; //,1433   .net, Persist Security Info=False; User
         [HttpPost]
-        public IActionResult AddToFavorites(string recipe, long chatId, string DateAdded) //
+        public IActionResult AddToFavorites([FromBody] AddToFavoriteModel addToFavoriteModel) //
         {
             connectionString = "Server=tcp:cource1-receipe-bot-db.database.windows.net,1433;Initial Catalog=ReceipeDB;Persist Security Info=False;User ID=inna2005sha;Password=Zaqwes123@;";
             using (SqlConnection connection = new SqlConnection(connectionString))
@@ -24,18 +24,18 @@ namespace Course1.RecipeBot.Api.Controllers
 
                 using (SqlCommand command = new SqlCommand(query, connection))
                 {
-                    command.Parameters.AddWithValue("@Recipe", recipe);
-                    command.Parameters.AddWithValue("@ChatId", chatId);
-                    command.Parameters.AddWithValue("@DateAdded", DateAdded);
+                    command.Parameters.AddWithValue("@Recipe", addToFavoriteModel.recipe);
+                    command.Parameters.AddWithValue("@ChatId", addToFavoriteModel.chatId);
+                    command.Parameters.AddWithValue("@DateAdded", addToFavoriteModel.dateAdded);
                     int rowsAffected = command.ExecuteNonQuery();
                 }
-
+                connection.Close();
             }
             return Ok();
         }
 
         [HttpDelete]
-        public IActionResult DeleteFromFavorites(string recipe, long chatId)
+        public IActionResult DeleteFromFavorites([FromBody] RemoveFromFavoriteModel remove)
         {
             using (SqlConnection connection = new SqlConnection(connectionString))
             {
@@ -45,8 +45,8 @@ namespace Course1.RecipeBot.Api.Controllers
 
                 using (SqlCommand command = new SqlCommand(query, connection))
                 {
-                    command.Parameters.AddWithValue("@Recipe", recipe);
-                    command.Parameters.AddWithValue("@ChatId", chatId);
+                    command.Parameters.AddWithValue("@Recipe", remove.recipe);
+                    command.Parameters.AddWithValue("@ChatId", remove.chatId);
                     int rowsAffected = command.ExecuteNonQuery();
                 }
                 connection.Close();
