@@ -1,4 +1,5 @@
 ﻿using Course1.RecipeBot.Shared;
+using System.Text;
 using Telegram.Bot;
 using Telegram.Bot.Exceptions;
 //using Telegram.Bot.Extensions.Polling;
@@ -15,7 +16,6 @@ namespace Course1.RecipeBot.TelegramBot
         long chatId;
         string action;
         int helperYoutube;
-        int numberOfFavoriteRecipe;
         int numberrecipe;
         string youtuberecipe;
         string previousmessagewithingridients;
@@ -31,6 +31,7 @@ namespace Course1.RecipeBot.TelegramBot
         {
             botClient.StartReceiving(HandletUpdateAsync, HandletErrorAsync, receiverOptions, token);
             var botMe = await botClient.GetMeAsync();
+            Console.OutputEncoding = Encoding.UTF8;
             Console.WriteLine($"Бот {botMe.Username} почав працювати");
             Console.ReadKey();
         }
@@ -102,6 +103,8 @@ namespace Course1.RecipeBot.TelegramBot
             }
             catch (Exception ex)
             {
+                Console.WriteLine(ex.ToString());
+
                 await botClient.SendTextMessageAsync(update.Message.Chat.Id, "Сталась помилка. Будь ласка, зверніться до адміністратора");
             }
 
@@ -313,11 +316,16 @@ namespace Course1.RecipeBot.TelegramBot
             else if (previousmessage == "Введіть назву страви")
             {
                 recipe = recipeService.GetReceipeVideoLink(message.Text + helperYoutube);
+                if (recipe == "За вашим запитом нічого не знайдено")
+                {
+                    More = "";
+                }
+                else More = "Ще";
                 ReplyKeyboardMarkup replyKeyboardMarkup = new
                         (
                           new[]
                           {
-                          new KeyboardButton[] {"Ще", "Назад"},
+                          new KeyboardButton[] {More, "Назад"},
                           }
                         )
                 {
@@ -408,17 +416,6 @@ namespace Course1.RecipeBot.TelegramBot
             };
             await botClient.SendTextMessageAsync(message.Chat.Id, "Збережений рецепт:", replyMarkup: replyKeyboardMarkup);
             await botClient.SendTextMessageAsync(message.Chat.Id, recipe, replyMarkup: inlineKeyboard);
-        }
-
-        private static bool IsUpperCase(string text)
-        {
-            // Проверка первого символа строки на большую букву
-            if (string.IsNullOrWhiteSpace(text))
-            {
-                return false;
-            }
-
-            return char.IsUpper(text[0]);
         }
     }
 }

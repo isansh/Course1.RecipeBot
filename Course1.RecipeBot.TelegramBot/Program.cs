@@ -9,7 +9,7 @@ namespace Course1.RecipeBot.TelegramBot
         {
             recipeBot = new RecipeTelegramBot();
             recipeBot.Start();
-            Console.ReadKey();
+            Console.ReadLine();
         }
     }
 }

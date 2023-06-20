@@ -13,7 +13,7 @@ namespace Course1.RecipeBot.Api.Client
             _adress = "https://api.openai.com/";
             _httpClient = new HttpClient();
             _httpClient.BaseAddress = new Uri(_adress);
-            _httpClient.DefaultRequestHeaders.Add("Authorization", "Bearer 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");
+            _httpClient.DefaultRequestHeaders.Add("Authorization", "Bearer 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");
         }
         public async Task<GptChatCompletionResponse> GetAsyncRecipe(string recipe)
         {
